@@ -92,8 +92,16 @@ button {
   cursor: pointer;
 }
 
+/* 이름 칸과 추가 버튼 */
+.add-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.add-footer input { width: 160px; min-width: 0; }
+
 .add-btn {
-  align-self: flex-end;
   padding: 10px 26px;
   font-size: 15px;
   font-weight: 600;
@@ -255,6 +263,16 @@ button {
   line-height: 1.45;
   word-break: break-all;
   cursor: text;
+}
+
+/* 할 일 글과 작성자 이름을 묶어, 이름이 글 바로 아래에 붙게 해요 */
+.note-main { flex: 1; }
+
+.note-author {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  word-break: break-all;
 }
 
 .note.done .note-text {

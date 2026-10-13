@@ -4,6 +4,7 @@ const MUSIC_SITES = ["youtube.com", "youtu.be", "music.youtube.com", "spotify.co
 const addForm = document.getElementById("add-form");
 const textInput = document.getElementById("text-input");
 const linkInput = document.getElementById("link-input");
+const authorInput = document.getElementById("author-input");
 const addError = document.getElementById("add-error");
 const addButton = addForm.querySelector(".add-btn");
 const board = document.getElementById("board");
@@ -185,13 +186,14 @@ async function request(method, query = "", body) {
 
 // 표의 빈 칸(null)은 앱에서 빈 글자("")로 다뤄요
 function fromRow(row) {
-  return { ...row, due: row.due ?? "", link: row.link ?? "" };
+  return { ...row, due: row.due ?? "", link: row.link ?? "", author: row.author ?? "" };
 }
 
 function toRow(todo) {
   const row = { ...todo };
   if ("due" in row) row.due = row.due || null;
   if ("link" in row) row.link = row.link || null;
+  if ("author" in row) row.author = row.author || null;
   return row;
 }
 
@@ -244,7 +246,17 @@ function createViewNote(todo) {
   text.textContent = todo.text;
   text.title = "더블클릭하면 수정할 수 있어요";
   text.addEventListener("dblclick", () => startEdit(todo.id));
-  note.appendChild(text);
+
+  const main = document.createElement("div");
+  main.className = "note-main";
+  main.appendChild(text);
+  if (todo.author) {
+    const author = document.createElement("p");
+    author.className = "note-author";
+    author.textContent = `— ${todo.author}`;
+    main.appendChild(author);
+  }
+  note.appendChild(main);
 
   if (todo.due || todo.link) {
     const tags = document.createElement("div");
@@ -335,6 +347,12 @@ function createEditNote(todo) {
   linkField.value = todo.link;
   linkField.placeholder = "링크 (선택)";
 
+  const authorField = document.createElement("input");
+  authorField.type = "text";
+  authorField.value = todo.author;
+  authorField.placeholder = "이름 (선택)";
+  authorField.maxLength = 20;
+
   const duePicker = createDuePicker(todo.due);
 
   const error = document.createElement("p");
@@ -359,7 +377,7 @@ function createEditNote(todo) {
   saveBtn.textContent = "저장";
 
   buttons.append(cancelBtn, saveBtn);
-  form.append(textField, linkField, duePicker.element, error, buttons);
+  form.append(textField, linkField, authorField, duePicker.element, error, buttons);
 
   // 브라우저 기본 주소 검사 대신 normalizeLink로 검사해요 (예: "youtube.com"도 허용)
   form.noValidate = true;
@@ -377,7 +395,7 @@ function createEditNote(todo) {
       error.hidden = false;
       return;
     }
-    const changes = { text, due: duePicker.getValue(), link };
+    const changes = { text, due: duePicker.getValue(), link, author: authorField.value.trim() };
     saveBtn.disabled = true;
     const ok = await save("수정한 내용을 저장하지", async () => {
       await request("PATCH", `?id=eq.${todo.id}`, toRow(changes));
@@ -479,7 +497,7 @@ addForm.addEventListener("submit", async (event) => {
   addError.hidden = true;
   addButton.disabled = true;
   const ok = await save("할 일을 추가하지", async () => {
-    const newTodo = { text, due: addDuePicker.getValue(), link, color: nextColor() };
+    const newTodo = { text, due: addDuePicker.getValue(), link, author: authorInput.value.trim(), color: nextColor() };
     const [row] = await request("POST", "", toRow(newTodo));
     todos.push(fromRow(row));
   });
