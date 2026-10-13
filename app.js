@@ -471,7 +471,7 @@ function render() {
   }
   empty.hidden = shownCount > 0;
 
-  summary.textContent = `전체 ${todos.length}개 · 완료 ${doneCount}개`;
+  summary.textContent = `남은 할 일 ${todos.length - doneCount}개 · 완료 ${doneCount}개 · 전체 ${todos.length}개`;
   clearDoneBtn.disabled = doneCount === 0;
 
   filterButtons.forEach((btn) => {
