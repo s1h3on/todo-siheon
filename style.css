@@ -30,10 +30,17 @@ body {
 }
 
 h1 {
-  margin: 0 0 20px;
+  margin: 0 0 4px;
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
+}
+
+/* 제목 아래 작은 글씨 */
+.subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: var(--muted);
 }
 
 /* 입력 영역 */
