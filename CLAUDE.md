@@ -32,3 +32,4 @@
 - 날짜는 내 컴퓨터 시간 기준 `"YYYY-MM-DD"` 문자열로 다룬다 (`toDateString`, `addDays`, `daysUntil`).
 - `[hidden]`은 CSS에서 `display: none !important`로 강제하고 있다. 숨김/표시는 `hidden` 속성으로 한다.
 - 화면 글자와 코드 주석은 한국어로 쓴다.
+- **주소·ID·열쇠는 `.env.local`에서 찾고, 새로 생기면 거기에 적는다.** 이 파일은 `.gitignore`로 git에서 빠져 있다.
