@@ -232,10 +232,19 @@ function nextColor() {
 
 // ----- 화면 그리기 -----
 
+// 마감이 가까운 순서. 마감일이 없으면 맨 아래로 가고, 마감일이 같으면 추가한 순서를 지켜요.
+function byDue(a, b) {
+  if (a.due === b.due) return 0;
+  if (!a.due) return 1;
+  if (!b.due) return -1;
+  return a.due < b.due ? -1 : 1;
+}
+
 function visibleTodos() {
-  if (filter === "active") return todos.filter((t) => !t.done);
-  if (filter === "done") return todos.filter((t) => t.done);
-  return todos;
+  let shown = todos;
+  if (filter === "active") shown = todos.filter((t) => !t.done);
+  if (filter === "done") shown = todos.filter((t) => t.done);
+  return [...shown].sort(byDue);
 }
 
 function createViewNote(todo) {
