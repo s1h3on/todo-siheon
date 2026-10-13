@@ -511,6 +511,8 @@ button {
 
 /* Supabase 저장 오류 알림 */
 .db-error {
+  /* 오류가 여러 개면 한 줄에 하나씩 보여요 */
+  white-space: pre-line;
   margin: 0 0 16px;
   padding: 10px 16px;
   font-size: 14px;

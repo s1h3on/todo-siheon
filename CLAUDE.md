@@ -39,7 +39,7 @@
 
 ## 지켜야 할 규칙
 
-- **할 일은 Supabase의 `todos` 표에 저장한다.** `request()`로 표에 먼저 저장하고, 성공한 뒤에만 `todos`를 바꾼다. 실패하면 `save()`가 화면 위쪽(`#db-error`)에 오류를 보여 준다. 표의 빈 칸(null)은 앱에서 빈 글자("")로 다룬다 (`fromRow`, `toRow`).
+- **할 일은 Supabase의 `todos` 표에 저장한다.** `request()`로 표에 먼저 저장하고, 성공한 뒤에만 `todos`를 바꾼다. 실패하면 `save()`가 화면 위쪽(`#db-error`)에 오류를 보여 준다. 오류는 key(`todos-load`, `todos`, `songs-load`, `songs`)별로 따로 기억하고(`dbErrors`), 성공하면 같은 key의 오류만 지운다. 여러 개면 한 줄에 하나씩 보인다. 표의 빈 칸(null)은 앱에서 빈 글자("")로 다룬다 (`fromRow`, `toRow`).
 - **`todos`·`songs` 표의 권한 설정(RLS)은 사용자가 요청할 때만 바꾼다.** 지금은 두 표 모두 RLS를 켜 두고, 규칙 4개(누구나 읽기·추가·고치기·지우기)로 로그인 없이 누구나 모든 일을 할 수 있게 열어 두었다.
 - `request(method, query, body, table)` — `table`을 안 주면 `todos`. 오노추는 `"songs"`를 준다.
 - 바깥 서비스: Supabase, YouTube(oEmbed·IFrame API), LRCLIB, jsDelivr(Galmuri 글꼴). 열쇠가 필요한 서비스는 쓰지 않는다.

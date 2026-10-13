@@ -206,15 +206,26 @@ function idsQuery(ids) {
   return `?id=in.(${[...ids].join(",")})`;
 }
 
+// 지금 남아 있는 오류들. 어떤 일에서 난 오류인지(key)마다 문구 하나씩 기억해요.
+// key: "todos-load"(할 일 불러오기), "todos"(할 일 저장), "songs-load"(노래 목록 불러오기), "songs"(노래 저장)
+const dbErrors = new Map();
+
+function showDbErrors() {
+  dbError.textContent = [...dbErrors.values()].join("\n");
+  dbError.hidden = dbErrors.size === 0;
+}
+
 // 저장 작업을 실행하고, 실패하면 화면 위쪽에 오류를 보여 줘요. 성공하면 true.
-async function save(action, work) {
+// 성공하면 같은 key의 오류만 지워요. 다른 일에서 난 오류는 그대로 남아요.
+async function save(action, work, key = "todos") {
   try {
     await work();
-    dbError.hidden = true;
+    dbErrors.delete(key);
+    showDbErrors();
     return true;
   } catch (error) {
-    dbError.textContent = `${action} 못했어요. (${error.message})`;
-    dbError.hidden = false;
+    dbErrors.set(key, `${action} 못했어요. (${error.message})`);
+    showDbErrors();
     return false;
   }
 }
@@ -223,7 +234,7 @@ async function loadTodos() {
   await save("할 일을 불러오지", async () => {
     const rows = await request("GET", "?select=*&order=created_at.asc,id.asc");
     todos = rows.map(fromRow);
-  });
+  }, "todos-load");
   loading = false;
   render();
 }
@@ -1012,7 +1023,7 @@ function stopPlayer() {
 async function loadSongs() {
   await save("노래 목록을 불러오지", async () => {
     songs = await request("GET", "?select=*&order=created_at.asc,id.asc", undefined, "songs");
-  });
+  }, "songs-load");
   renderSongs();
   updateSongInfo();
 }
@@ -1020,7 +1031,7 @@ async function loadSongs() {
 async function deleteSong(song) {
   const ok = await save("노래를 지우지", async () => {
     await request("DELETE", `?id=eq.${song.id}`, undefined, "songs");
-  });
+  }, "songs");
   if (!ok) return;
   const removed = songs.indexOf(song);
   songs = songs.filter((s) => s !== song);
@@ -1090,7 +1101,7 @@ songForm.addEventListener("submit", async (event) => {
   const ok = await save("노래를 추가하지", async () => {
     const [row] = await request("POST", "", { url: href, title, artist: artist || null }, "songs");
     songs.push(row);
-  });
+  }, "songs");
   songAddBtn.disabled = false;
   if (!ok) return;
   songForm.reset();
