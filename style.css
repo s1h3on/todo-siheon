@@ -38,9 +38,393 @@ h1 {
 
 /* 제목 아래 작은 글씨 */
 .subtitle {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 14px;
   color: var(--muted);
+}
+
+/* 맨 위: 왼쪽에 LP, 오른쪽에 제목 */
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* ----- 오노추: Y2K MP3 플레이어 ----- */
+.mp3 {
+  position: relative;
+  margin-left: auto;
+  width: 290px;
+  padding: 10px 12px 12px;
+  /* 진주빛 은색 몸통 */
+  background: linear-gradient(160deg, #fdfcfa 0%, #e9e6e1 45%, #f7f5f1 60%, #dcd8d1 100%);
+  border: 1px solid #d2ccc3;
+  border-radius: 22px;
+  box-shadow: inset 0 1px 0 #fff, 0 3px 10px rgba(120, 100, 80, 0.12);
+}
+
+.mp3-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 4px 6px;
+}
+
+.mp3-brand {
+  font-family: "Galmuri11", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #7a6c5d;
+}
+
+.mp3-model {
+  font-family: "Galmuri7", monospace;
+  font-size: 9px;
+  color: #a39a8f;
+}
+
+/* 연한 민트빛 LCD 화면 */
+.mp3-screen {
+  padding: 8px 10px 6px;
+  font-family: "Galmuri11", monospace;
+  color: #2f4a44;
+  background: linear-gradient(180deg, #d9eee6 0%, #c5e3d8 100%);
+  border: 2px solid #b9c9c2;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 4px rgba(40, 70, 60, 0.18);
+  overflow: hidden;
+}
+
+/* 노래 제목이 옆으로 흘러가요 */
+.mp3-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.mp3-marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: mp3-marquee 12s linear infinite;
+}
+
+.mp3-lyric,
+.mp3-lyric-next {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mp3-lyric {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  min-height: 1.4em;
+}
+
+.mp3-lyric-next {
+  font-size: 11px;
+  color: #6f8a83;
+  min-height: 1.4em;
+}
+
+.mp3-progress {
+  height: 4px;
+  margin-top: 6px;
+  background: rgba(47, 74, 68, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mp3-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: #2f4a44;
+}
+
+.mp3-time {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-family: "Galmuri7", monospace;
+  font-size: 9px;
+}
+
+.mp3-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* 반짝이는 알약 버튼 */
+.mp3-btn {
+  min-width: 34px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: #6b5f52;
+  background: linear-gradient(180deg, #ffffff 0%, #e6e1da 100%);
+  border: 1px solid #cfc7bc;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 #fff;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.mp3-btn:hover { border-color: var(--accent); }
+.mp3-btn:active { transform: scale(0.94); }
+
+.mp3-play {
+  min-width: 78px;
+  font-family: "Galmuri11", monospace;
+  font-weight: 700;
+}
+
+/* 노래 목록과 추가 칸 */
+.mp3-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+  width: 320px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(120, 100, 80, 0.12);
+  animation: palette-pop 0.15s ease-out;
+}
+
+.mp3-panel-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mp3-list {
+  max-height: 200px;
+  margin: 0 0 10px;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.mp3-list li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mp3-list-empty {
+  padding: 6px 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.mp3-song-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text);
+  background: transparent;
+  border-radius: 8px;
+}
+
+.mp3-song-btn:hover { background: var(--accent-soft); }
+
+.mp3-song-btn.playing {
+  font-weight: 600;
+  background: var(--accent-soft);
+}
+
+.mp3-song-btn .artist { color: var(--muted); }
+
+.song-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.song-form input { width: 100%; min-width: 0; padding: 7px 10px; font-size: 13px; }
+
+.song-form-row {
+  display: flex;
+  gap: 6px;
+}
+
+.song-add-btn {
+  align-self: flex-end;
+  padding: 6px 16px;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.song-add-btn:hover { background: var(--accent-dark); }
+
+/* 소리를 내는 YouTube 플레이어는 화면 밖에 둬요 */
+.yt-box {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+}
+
+@keyframes mp3-marquee {
+  to { transform: translateX(-100%); }
+}
+
+/* 이전 색 화살표 · LP · 다음 색 화살표를 한 줄로 */
+.lp-wrap {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lp-arrow {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transition: color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.lp-arrow:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.lp-arrow:active { transform: scale(0.9); }
+
+/* 돌아가는 LP. 가운데 색은 --lp-color로 바꿔요 */
+.lp {
+  --lp-color: #b89b7a;
+  position: relative;
+  display: block;
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border-radius: 50%;
+  background: none;
+  box-shadow: 0 2px 8px rgba(60, 45, 30, 0.18);
+  transition: transform 0.15s;
+}
+
+.lp:hover { transform: scale(1.05); }
+
+.lp-disc {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* 가는 홈이 동그랗게 이어진 검은 디스크 */
+  background: repeating-radial-gradient(circle, #1c1c1c 0 1.5px, #262626 1.5px 3px);
+  animation: lp-spin 3.6s linear infinite;
+}
+
+.lp-label {
+  position: absolute;
+  inset: 33%;
+  border-radius: 50%;
+  background: var(--lp-color);
+  /* 버건디·네이비 같은 어두운 색도 검은 디스크와 구분되게 옅은 테두리 */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: background 0.3s;
+}
+
+/* 돌아가는 게 보이도록 라벨에 붙인 작은 줄 */
+.lp-label::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 2px;
+  height: 22%;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* 가운데 구멍 */
+.lp-label::after {
+  content: "";
+  position: absolute;
+  inset: 42%;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+/* 디스크 위에 고정된 은은한 빛 반사 (디스크와 같이 돌지 않아요) */
+.lp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 30deg, transparent 0 8%, rgba(255, 255, 255, 0.12) 13%, transparent 20% 55%, rgba(255, 255, 255, 0.08) 62%, transparent 70%);
+  pointer-events: none;
+}
+
+/* LP를 누르면 아래에 뜨는 색 버튼 모음 */
+.lp-palette {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(5, 26px);
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(120, 100, 80, 0.12);
+  animation: palette-pop 0.15s ease-out;
+}
+
+.lp-swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: transform 0.1s;
+}
+
+.lp-swatch:hover { transform: scale(1.12); }
+
+.lp-swatch.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes lp-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes palette-pop {
+  from { opacity: 0; transform: translateY(-4px); }
 }
 
 /* 입력 영역 */

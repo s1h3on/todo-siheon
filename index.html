@@ -4,12 +4,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>시헌의 할 일 목록</title>
+  <!-- 오노추 플레이어 화면에 쓰는 한국어 픽셀 글꼴 (Galmuri) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="app">
-    <h1>시헌의 할 일 목록</h1>
-    <p class="subtitle">시헌의 할 일</p>
+    <header class="app-header">
+      <div class="lp-wrap" id="lp-wrap">
+        <button type="button" class="lp-arrow" id="lp-prev" title="이전 색" aria-label="LP 이전 색">‹</button>
+        <button type="button" class="lp" id="lp" title="눌러서 가운데 색 바꾸기" aria-label="LP 가운데 색 바꾸기" aria-expanded="false" aria-controls="lp-palette">
+          <span class="lp-disc">
+            <span class="lp-label"></span>
+          </span>
+        </button>
+        <button type="button" class="lp-arrow" id="lp-next" title="다음 색" aria-label="LP 다음 색">›</button>
+        <div class="lp-palette" id="lp-palette" hidden></div>
+      </div>
+      <div>
+        <h1>시헌의 할 일 목록</h1>
+        <p class="subtitle">시헌의 할 일</p>
+      </div>
+
+      <!-- 오노추: 오늘의 노래 추천. Y2K MP3 플레이어 -->
+      <section class="mp3" id="mp3" aria-label="오노추 플레이어">
+        <div class="mp3-top">
+          <span class="mp3-brand">오노추</span>
+          <span class="mp3-model">오늘의 노래 추천 · MP3</span>
+        </div>
+        <div class="mp3-screen">
+          <div class="mp3-marquee"><span id="mp3-song">노래를 추가해 보세요</span></div>
+          <p class="mp3-lyric" id="mp3-lyric">♪ ♫ ♪</p>
+          <p class="mp3-lyric-next" id="mp3-lyric-next"></p>
+          <div class="mp3-progress"><span id="mp3-bar"></span></div>
+          <div class="mp3-time"><span id="mp3-now">0:00</span><span id="mp3-total">0:00</span></div>
+        </div>
+        <div class="mp3-controls">
+          <button type="button" class="mp3-btn" id="mp3-prev" title="이전 노래" aria-label="이전 노래">⏮</button>
+          <button type="button" class="mp3-btn mp3-play" id="mp3-play">▶ play</button>
+          <button type="button" class="mp3-btn" id="mp3-next" title="다음 노래" aria-label="다음 노래">⏭</button>
+          <button type="button" class="mp3-btn" id="mp3-list-btn" title="노래 목록" aria-label="노래 목록" aria-expanded="false" aria-controls="mp3-panel">☰</button>
+        </div>
+
+        <div class="mp3-panel" id="mp3-panel" hidden>
+          <p class="mp3-panel-title">노래 목록</p>
+          <ol class="mp3-list" id="mp3-list"></ol>
+          <form id="song-form" class="song-form">
+            <input type="url" id="song-link" placeholder="YouTube 노래 링크" autocomplete="off">
+            <div class="song-form-row">
+              <input type="text" id="song-title" placeholder="노래 제목" maxlength="200" autocomplete="off">
+              <input type="text" id="song-artist" placeholder="만든 사람 (선택)" maxlength="200" autocomplete="off">
+            </div>
+            <p id="song-error" class="error" hidden></p>
+            <button type="submit" class="song-add-btn">노래 추가</button>
+          </form>
+        </div>
+
+        <!-- 노래를 실제로 재생하는 YouTube 플레이어 (화면에는 안 보여요) -->
+        <div class="yt-box" aria-hidden="true"><div id="yt-player"></div></div>
+      </section>
+    </header>
     <p id="db-error" class="db-error" role="alert" hidden></p>
 
     <form id="add-form" class="add-form">
