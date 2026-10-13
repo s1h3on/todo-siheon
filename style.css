@@ -110,6 +110,17 @@ button {
   color: var(--warn);
 }
 
+/* Supabase 저장 오류 알림 */
+.db-error {
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--warn);
+  background: #fbefe9;
+  border: 1px solid #efd3c6;
+  border-radius: 12px;
+}
+
 /* 마감일 버블 */
 .due-picker {
   display: flex;

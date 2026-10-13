@@ -4,9 +4,10 @@
 
 ## 파일 구조
 
-- `index.html` — 화면 구조만. `style.css`와 `app.js`를 불러온다.
+- `index.html` — 화면 구조만. `style.css`, `config.js`, `app.js`를 불러온다.
 - `style.css` — 모든 디자인. 색은 `:root`의 CSS 변수(`--bg`, `--accent` 등)로 관리한다.
-- `app.js` — 모든 동작. 상태(`todos`, `filter`, `editingId`, `selecting`, `selectedIds`)를 바꾼 뒤 `render()`로 화면 전체를 다시 그린다.
+- `config.js` — Supabase 접속 정보(`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`). 공개용 publishable key만 넣는다.
+- `app.js` — 모든 동작. 상태(`todos`, `loading`, `filter`, `editingId`, `selecting`, `selectedIds`)를 바꾼 뒤 `render()`로 화면 전체를 다시 그린다.
 - `index-v1.html` — 맨 처음 만든 단순 버전. 참고용으로 보관 중이니 지우거나 고치지 않는다.
 
 ## 실행
@@ -25,7 +26,8 @@
 
 ## 지켜야 할 규칙
 
-- **저장하지 않는다.** 새로고침하면 목록이 사라지는 것이 의도된 동작이다. localStorage 등은 사용자가 요청할 때만 추가한다.
+- **할 일은 Supabase의 `todos` 표에 저장한다.** `request()`로 표에 먼저 저장하고, 성공한 뒤에만 `todos`를 바꾼다. 실패하면 `save()`가 화면 위쪽(`#db-error`)에 오류를 보여 준다. 표의 빈 칸(null)은 앱에서 빈 글자("")로 다룬다 (`fromRow`, `toRow`).
+- **`todos` 표의 권한 설정(RLS)은 사용자가 요청할 때만 바꾼다.** 지금은 RLS를 켜 두고, 규칙 4개(누구나 읽기·추가·고치기·지우기)로 로그인 없이 누구나 모든 일을 할 수 있게 열어 두었다.
 - **디자인 톤**: 흰색과 베이지 사이의 차분한 색, 둥근 모서리, 버블(알약 모양) 버튼. 진한 원색이나 강한 그림자는 쓰지 않는다.
 - **사용자 입력은 `textContent`로 넣는다.** `innerHTML`에 사용자 글을 넣지 않는다.
 - **링크는 `normalizeLink()`를 거친다.** http/https만 허용하고, `rel="noopener noreferrer"`로 새 탭에서 연다.

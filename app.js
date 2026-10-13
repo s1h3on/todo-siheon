@@ -5,6 +5,7 @@ const addForm = document.getElementById("add-form");
 const textInput = document.getElementById("text-input");
 const linkInput = document.getElementById("link-input");
 const addError = document.getElementById("add-error");
+const addButton = addForm.querySelector(".add-btn");
 const board = document.getElementById("board");
 const empty = document.getElementById("empty");
 const summary = document.getElementById("summary");
@@ -17,9 +18,10 @@ const selectCount = document.getElementById("select-count");
 const selectAllBtn = document.getElementById("select-all");
 const deleteSelectedBtn = document.getElementById("delete-selected");
 const selectDoneBtn = document.getElementById("select-done");
+const dbError = document.getElementById("db-error");
 
 let todos = [];
-let nextId = 1;
+let loading = true;
 let filter = "all";
 let editingId = null;
 let selecting = false;
@@ -149,6 +151,83 @@ function isMusicLink(href) {
   return MUSIC_SITES.some((site) => host === site || host.endsWith("." + site));
 }
 
+// ----- Supabase 저장 -----
+// config.js의 SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY로 todos 표를 읽고 써요.
+
+const TODOS_URL = `${SUPABASE_URL}/rest/v1/todos`;
+
+// 표에 요청을 보내고, 바뀐 줄들을 배열로 돌려받아요. 실패하면 오류를 던져요.
+async function request(method, query = "", body) {
+  let response;
+  try {
+    response = await fetch(TODOS_URL + query, {
+      method,
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        "Content-Type": "application/json",
+        Prefer: "return=representation",
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new Error("인터넷 연결을 확인해 주세요");
+  }
+  if (!response.ok) {
+    let detail = `오류 코드 ${response.status}`;
+    try {
+      const data = await response.json();
+      if (data.message) detail += ` · ${data.message}`;
+    } catch {}
+    throw new Error(detail);
+  }
+  return response.json();
+}
+
+// 표의 빈 칸(null)은 앱에서 빈 글자("")로 다뤄요
+function fromRow(row) {
+  return { ...row, due: row.due ?? "", link: row.link ?? "" };
+}
+
+function toRow(todo) {
+  const row = { ...todo };
+  if ("due" in row) row.due = row.due || null;
+  if ("link" in row) row.link = row.link || null;
+  return row;
+}
+
+function idsQuery(ids) {
+  return `?id=in.(${[...ids].join(",")})`;
+}
+
+// 저장 작업을 실행하고, 실패하면 화면 위쪽에 오류를 보여 줘요. 성공하면 true.
+async function save(action, work) {
+  try {
+    await work();
+    dbError.hidden = true;
+    return true;
+  } catch (error) {
+    dbError.textContent = `${action} 못했어요. (${error.message})`;
+    dbError.hidden = false;
+    return false;
+  }
+}
+
+async function loadTodos() {
+  await save("할 일을 불러오지", async () => {
+    const rows = await request("GET", "?select=*&order=created_at.asc,id.asc");
+    todos = rows.map(fromRow);
+  });
+  loading = false;
+  render();
+}
+
+// 마지막 메모 다음 색을 골라요
+function nextColor() {
+  const last = todos[todos.length - 1];
+  if (!last) return COLORS[0];
+  return COLORS[(COLORS.indexOf(last.color) + 1) % COLORS.length];
+}
+
 // ----- 화면 그리기 -----
 
 function visibleTodos() {
@@ -201,8 +280,13 @@ function createViewNote(todo) {
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.checked = todo.done;
-  checkbox.addEventListener("change", () => {
-    todo.done = checkbox.checked;
+  checkbox.addEventListener("change", async () => {
+    const done = checkbox.checked;
+    await save("완료 표시를 저장하지", async () => {
+      await request("PATCH", `?id=eq.${todo.id}`, { done });
+      todo.done = done;
+    });
+    // 실패하면 체크 상태가 원래대로 돌아가요
     render();
   });
   checkLabel.append(checkbox, todo.done ? "완료!" : "완료");
@@ -221,8 +305,11 @@ function createViewNote(todo) {
   deleteBtn.className = "icon-btn delete";
   deleteBtn.textContent = "✕";
   deleteBtn.title = "삭제";
-  deleteBtn.addEventListener("click", () => {
-    todos = todos.filter((t) => t.id !== todo.id);
+  deleteBtn.addEventListener("click", async () => {
+    await save("메모를 지우지", async () => {
+      await request("DELETE", `?id=eq.${todo.id}`);
+      todos = todos.filter((t) => t.id !== todo.id);
+    });
     render();
   });
 
@@ -276,7 +363,7 @@ function createEditNote(todo) {
 
   // 브라우저 기본 주소 검사 대신 normalizeLink로 검사해요 (예: "youtube.com"도 허용)
   form.noValidate = true;
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = textField.value.trim();
     const link = normalizeLink(linkField.value);
@@ -290,9 +377,15 @@ function createEditNote(todo) {
       error.hidden = false;
       return;
     }
-    todo.text = text;
-    todo.due = duePicker.getValue();
-    todo.link = link;
+    const changes = { text, due: duePicker.getValue(), link };
+    saveBtn.disabled = true;
+    const ok = await save("수정한 내용을 저장하지", async () => {
+      await request("PATCH", `?id=eq.${todo.id}`, toRow(changes));
+      Object.assign(todo, changes);
+    });
+    saveBtn.disabled = false;
+    // 실패하면 고치던 내용이 사라지지 않게 수정 칸을 그대로 둬요
+    if (!ok) return;
     editingId = null;
     render();
   });
@@ -342,7 +435,9 @@ function render() {
     deleteSelectedBtn.disabled = selectedIds.size === 0;
   }
 
-  if (todos.length === 0) {
+  if (loading) {
+    empty.textContent = "할 일을 불러오는 중이에요…";
+  } else if (todos.length === 0) {
     empty.textContent = "아직 메모가 없어요. 위에서 할 일을 추가해 보세요.";
   } else if (shownCount === 0) {
     empty.textContent = filter === "done" ? "완료한 메모가 없어요." : "진행 중인 메모가 없어요. 다 끝냈네요! 🎉";
@@ -363,7 +458,7 @@ const addDuePicker = createDuePicker();
 document.getElementById("add-due").appendChild(addDuePicker.element);
 
 addForm.noValidate = true;
-addForm.addEventListener("submit", (event) => {
+addForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const text = textInput.value.trim();
   const link = normalizeLink(linkInput.value);
@@ -381,17 +476,17 @@ addForm.addEventListener("submit", (event) => {
     return;
   }
 
-  todos.push({
-    id: nextId,
-    text,
-    due: addDuePicker.getValue(),
-    link,
-    done: false,
-    color: COLORS[(nextId - 1) % COLORS.length],
-  });
-  nextId++;
-
   addError.hidden = true;
+  addButton.disabled = true;
+  const ok = await save("할 일을 추가하지", async () => {
+    const newTodo = { text, due: addDuePicker.getValue(), link, color: nextColor() };
+    const [row] = await request("POST", "", toRow(newTodo));
+    todos.push(fromRow(row));
+  });
+  addButton.disabled = false;
+  // 실패하면 적어 둔 내용을 지우지 않아요
+  if (!ok) return;
+
   textInput.value = "";
   linkInput.value = "";
   addDuePicker.reset();
@@ -436,9 +531,15 @@ selectAllBtn.addEventListener("click", () => {
   render();
 });
 
-deleteSelectedBtn.addEventListener("click", () => {
-  todos = todos.filter((t) => !selectedIds.has(t.id));
-  exitSelecting();
+deleteSelectedBtn.addEventListener("click", async () => {
+  const ids = new Set(selectedIds);
+  const ok = await save("선택한 메모를 지우지", async () => {
+    await request("DELETE", idsQuery(ids));
+    todos = todos.filter((t) => !ids.has(t.id));
+  });
+  // 실패하면 선택을 그대로 두고 다시 시도할 수 있게 해요
+  if (ok) exitSelecting();
+  else render();
 });
 
 selectDoneBtn.addEventListener("click", exitSelecting);
@@ -447,9 +548,14 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && selecting) exitSelecting();
 });
 
-clearDoneBtn.addEventListener("click", () => {
-  todos = todos.filter((t) => !t.done);
+clearDoneBtn.addEventListener("click", async () => {
+  const ids = new Set(todos.filter((t) => t.done).map((t) => t.id));
+  await save("완료한 메모를 지우지", async () => {
+    await request("DELETE", idsQuery(ids));
+    todos = todos.filter((t) => !ids.has(t.id));
+  });
   render();
 });
 
 render();
+loadTodos();
