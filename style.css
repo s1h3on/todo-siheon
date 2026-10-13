@@ -1,0 +1,434 @@
+:root {
+  --bg: #f7f3ec;
+  --panel: #fffdf9;
+  --line: #e8dfd2;
+  --text: #4a4036;
+  --muted: #9a8c7c;
+  --accent: #b89b7a;
+  --accent-dark: #9c7f5f;
+  --accent-soft: #efe4d6;
+  --warn: #c4775a;
+}
+
+* { box-sizing: border-box; }
+
+/* display: flex 같은 스타일이 있어도 hidden이면 확실히 숨겨요 */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 40px 24px;
+  font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* 입력 영역 */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(120, 100, 80, 0.06);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.row > input { flex: 1 1 220px; }
+
+.field-label {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+input[type="text"],
+input[type="date"],
+input[type="url"] {
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+}
+
+input:focus { border-color: var(--accent); }
+input::placeholder { color: #bfb3a5; }
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+.add-btn {
+  align-self: flex-end;
+  padding: 10px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.add-btn:hover { background: var(--accent-dark); }
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--warn);
+}
+
+/* 마감일 버블 */
+.due-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.bubble {
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.bubble:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.bubble.selected {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.due-picker input[type="date"] {
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 999px;
+}
+
+/* 필터 / 도구 막대 */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 24px 0 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
+
+.filter-btn {
+  padding: 6px 16px;
+  color: var(--muted);
+  background: transparent;
+  border-radius: 999px;
+}
+
+.filter-btn.active {
+  color: var(--text);
+  font-weight: 600;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(120, 100, 80, 0.12);
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.clear-btn {
+  padding: 6px 14px;
+  color: var(--warn);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.clear-btn:hover:not(:disabled) { background: #fbefe9; }
+
+.clear-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 메모판 */
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 18px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  padding: 40px 0;
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+  padding: 18px 16px 12px;
+  border: 1px solid rgba(160, 135, 105, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(120, 100, 80, 0.08);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(120, 100, 80, 0.12);
+}
+
+.note.white  { background: #ffffff; }
+.note.ivory  { background: #fdfaf3; }
+.note.cream  { background: #f9f2e5; }
+.note.linen  { background: #f4ebdd; }
+.note.sand   { background: #efe3d1; }
+
+.note-text {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  word-break: break-all;
+  cursor: text;
+}
+
+.note.done .note-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.note.done { opacity: 0.7; }
+
+.note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.due-tag,
+.note-link {
+  display: inline-block;
+  max-width: 100%;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.due-tag {
+  color: var(--accent-dark);
+  background: rgba(184, 155, 122, 0.15);
+}
+
+.due-tag.soon {
+  color: #fff;
+  background: var(--accent);
+}
+
+.due-tag.overdue {
+  color: var(--warn);
+  background: #fbe9e1;
+}
+
+.note-link {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--line);
+  text-decoration: none;
+}
+
+.note-link:hover { border-color: var(--accent); }
+
+.note-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(160, 135, 105, 0.15);
+}
+
+.note-actions label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.note-actions input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.icon-btn {
+  padding: 4px 8px;
+  color: var(--muted);
+  background: transparent;
+  border-radius: 8px;
+}
+
+.icon-btn:hover { background: rgba(160, 135, 105, 0.12); }
+.icon-btn.delete:hover { color: var(--warn); }
+
+/* 여러 개 선택 */
+.select-btn {
+  padding: 6px 14px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.select-btn:hover:not(:disabled) { border-color: var(--accent); }
+
+.select-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.select-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.select-bar .count { font-weight: 600; margin-right: 4px; }
+
+.delete-selected-btn {
+  padding: 6px 14px;
+  color: #fff;
+  background: var(--warn);
+  border-radius: 999px;
+}
+
+.delete-selected-btn:hover:not(:disabled) { background: #ad6249; }
+
+.delete-selected-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.note.selectable {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 선택 모드에서는 메모 안의 버튼과 링크 대신 메모 전체가 눌려요 */
+.note.selectable > * { pointer-events: none; }
+
+.note.selectable::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.note.selectable.selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.note.selectable.selected::after {
+  content: "✓";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* 수정 모드 */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-form > input { width: 100%; font-size: 14px; padding: 8px 10px; }
+
+.edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.save-btn {
+  color: #fff;
+  background: var(--accent);
+}
+
+.cancel-btn {
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+}

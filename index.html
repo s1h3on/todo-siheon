@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>할 일 메모판</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <h1>할 일 메모판</h1>
+
+    <form id="add-form" class="add-form">
+      <div class="row">
+        <input type="text" id="text-input" placeholder="할 일을 적어 주세요" autocomplete="off">
+        <input type="url" id="link-input" placeholder="링크 (노래, 과제 사이트 · 선택)" autocomplete="off">
+      </div>
+      <div>
+        <p class="field-label">언제까지?</p>
+        <div id="add-due"></div>
+      </div>
+      <p id="add-error" class="error" hidden></p>
+      <button type="submit" class="add-btn">추가</button>
+    </form>
+
+    <div class="toolbar">
+      <div class="filters">
+        <button type="button" class="filter-btn active" data-filter="all">전체</button>
+        <button type="button" class="filter-btn" data-filter="active">진행 중</button>
+        <button type="button" class="filter-btn" data-filter="done">완료</button>
+      </div>
+      <div id="normal-tools" class="toolbar-right">
+        <span id="summary"></span>
+        <button type="button" id="clear-done" class="clear-btn">완료한 메모 모두 지우기</button>
+        <button type="button" id="select-mode" class="select-btn">☑ 여러 개 선택</button>
+      </div>
+      <div id="select-tools" class="select-bar" hidden>
+        <span id="select-count" class="count"></span>
+        <button type="button" id="select-all" class="select-btn">모두 선택</button>
+        <button type="button" id="delete-selected" class="delete-selected-btn">선택한 메모 지우기</button>
+        <button type="button" id="select-done" class="select-btn">완료</button>
+      </div>
+    </div>
+
+    <section id="board" class="board"></section>
+    <p id="empty" class="empty"></p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>할 일 목록</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 16px;
+      font-family: system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+      background: #f3f4f6;
+      color: #1f2937;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      padding: 28px;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      font-size: 24px;
+    }
+
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #3b82f6;
+    }
+
+    button {
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      padding: 10px 16px;
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .add-btn:hover {
+      background: #2563eb;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 4px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    li input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    li span {
+      flex: 1;
+      word-break: break-all;
+    }
+
+    li.done span {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+
+    .delete-btn {
+      padding: 4px 10px;
+      background: transparent;
+      color: #ef4444;
+    }
+
+    .delete-btn:hover {
+      background: #fee2e2;
+    }
+
+    .empty {
+      text-align: center;
+      color: #9ca3af;
+      padding: 20px 0;
+    }
+
+    .summary {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>할 일 목록</h1>
+
+    <form id="todo-form">
+      <input type="text" id="todo-input" placeholder="할 일을 입력하세요" autocomplete="off">
+      <button type="submit" class="add-btn">추가</button>
+    </form>
+
+    <ul id="todo-list"></ul>
+    <p id="empty" class="empty">아직 할 일이 없어요.</p>
+    <p id="summary" class="summary"></p>
+  </main>
+
+  <script>
+    const form = document.getElementById("todo-form");
+    const input = document.getElementById("todo-input");
+    const list = document.getElementById("todo-list");
+    const empty = document.getElementById("empty");
+    const summary = document.getElementById("summary");
+
+    let todos = [];
+    let nextId = 1;
+
+    function render() {
+      list.innerHTML = "";
+
+      for (const todo of todos) {
+        const li = document.createElement("li");
+        if (todo.done) li.classList.add("done");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.done;
+        checkbox.addEventListener("change", () => {
+          todo.done = checkbox.checked;
+          render();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = todo.text;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "삭제";
+        deleteBtn.addEventListener("click", () => {
+          todos = todos.filter((t) => t.id !== todo.id);
+          render();
+        });
+
+        li.append(checkbox, text, deleteBtn);
+        list.appendChild(li);
+      }
+
+      const doneCount = todos.filter((t) => t.done).length;
+      empty.hidden = todos.length > 0;
+      summary.textContent = todos.length > 0
+        ? `전체 ${todos.length}개 · 완료 ${doneCount}개`
+        : "";
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      todos.push({ id: nextId++, text, done: false });
+      input.value = "";
+      input.focus();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
