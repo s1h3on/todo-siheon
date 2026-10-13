@@ -35,7 +35,7 @@
   - 버튼: ⏮ · ▶ play / ❚❚ pause · ⏭ · ☰(노래 목록). 다 들으면 다음 노래로 넘어간다.
   - 노래 목록: Supabase `songs` 표에 저장. YouTube 링크만 받는다 (`youTubeId`). 링크를 넣으면 YouTube oEmbed로 제목·만든 사람을 짐작해 빈 칸을 채운다 (`guessSong`, 직접 고칠 수 있음).
   - 재생: YouTube IFrame 플레이어를 화면 밖(`.yt-box`)에 두고 소리만 쓴다.
-  - 가사: LRCLIB(lrclib.net)에서 시간이 붙은 가사(`syncedLyrics`)를 찾아 재생 시간에 맞춰 보여 준다 (`findLyrics`, `parseLrc`, 0.25초마다 `tick`). 가사는 저장하지 않는다.
+  - 가사: LRCLIB(lrclib.net)에서 시간이 붙은 가사(`syncedLyrics`)를 찾아 재생 시간에 맞춰 보여 준다 (`findLyrics`, `parseLrc`, 0.25초마다 `tick`). 가사는 저장하지 않는다. 화면보다 긴 줄은 부르는 동안 왼쪽으로 밀려 끝까지 보인다 (`slideLyric`: 처음 15% 멈춤 → 70% 동안 밀림 → 끝 15% 멈춤). 긴 메시지는 6초마다 밀었다 돌아온다.
 
 ## 지켜야 할 규칙
 

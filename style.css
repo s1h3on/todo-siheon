@@ -116,14 +116,21 @@ h1 {
   margin: 0;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
 }
+
+.mp3-lyric-next { text-overflow: ellipsis; }
 
 .mp3-lyric {
   margin-top: 6px;
   font-size: 13px;
   font-weight: 700;
   min-height: 1.4em;
+}
+
+/* 긴 가사 줄은 부르는 동안 옆으로 밀려 끝까지 보여요 (app.js의 slideLyric) */
+.mp3-lyric span {
+  display: inline-block;
+  transition: transform 0.25s linear;
 }
 
 .mp3-lyric-next {

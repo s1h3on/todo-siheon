@@ -670,6 +670,7 @@ setLpColor(0);
 const mp3 = document.getElementById("mp3");
 const mp3Song = document.getElementById("mp3-song");
 const mp3Lyric = document.getElementById("mp3-lyric");
+const mp3LyricText = document.getElementById("mp3-lyric-text");
 const mp3LyricNext = document.getElementById("mp3-lyric-next");
 const mp3Bar = document.getElementById("mp3-bar");
 const mp3Now = document.getElementById("mp3-now");
@@ -824,17 +825,46 @@ function showMessage(message) {
   showLyrics(0);
 }
 
+// 지금 가사 줄을 바꿔요. 줄이 바뀌면 밀려 있던 글자를 애니메이션 없이 처음 자리로 돌려놔요.
+function setLyricText(text) {
+  if (mp3LyricText.textContent === text) return;
+  mp3LyricText.style.transition = "none";
+  mp3LyricText.style.transform = "translateX(0)";
+  mp3LyricText.textContent = text;
+  void mp3LyricText.offsetWidth; // 브라우저가 처음 자리를 먼저 그리게 해요
+  mp3LyricText.style.transition = "";
+}
+
+// 화면보다 긴 가사 줄은 부르는 동안 왼쪽으로 밀어서 끝까지 보여 줘요.
+// 줄의 처음 15%는 멈춰 있다가, 70% 동안 천천히 밀리고, 마지막 15%는 끝부분에 멈춰 있어요.
+function slideLyric(progress) {
+  const overflow = mp3LyricText.offsetWidth - mp3Lyric.clientWidth;
+  const amount = Math.min(1, Math.max(0, (progress - 0.15) / 0.7));
+  mp3LyricText.style.transform = overflow > 0 ? `translateX(${-overflow * amount}px)` : "translateX(0)";
+}
+
 // 재생 시간에 맞는 가사 줄과 그다음 줄을 보여 줘요
 function showLyrics(now) {
   if (lyricsMessage) {
-    setText(mp3Lyric, lyricsMessage);
+    setLyricText(lyricsMessage);
+    // 메시지는 부르는 시간이 없으니 6초마다 한 번씩 밀었다가 돌아와요
+    slideLyric(((Date.now() / 1000) % 6) / 6);
     setText(mp3LyricNext, "");
     return;
   }
   let i = -1;
   while (i + 1 < lyrics.length && lyrics[i + 1].time <= now + 0.2) i++;
-  setText(mp3Lyric, i >= 0 ? lyrics[i].text || "♪" : "♪ ♫ ♪");
+  setLyricText(i >= 0 ? lyrics[i].text || "♪" : "♪ ♫ ♪");
   setText(mp3LyricNext, lyrics[i + 1]?.text || "");
+
+  // 이 줄을 부르는 시간: 다음 줄이 시작할 때까지 (마지막 줄은 5초로 봐요)
+  if (i >= 0) {
+    const start = lyrics[i].time;
+    const end = lyrics[i + 1]?.time ?? start + 5;
+    slideLyric((now - start) / Math.max(0.5, end - start));
+  } else {
+    slideLyric(0);
+  }
 }
 
 function tick() {
